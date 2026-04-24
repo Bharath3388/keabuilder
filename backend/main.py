@@ -39,17 +39,29 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
+# Middleware order: last added = outermost (first to run)
+# CORS must be outermost so preflight OPTIONS are handled before anything else.
+
+# Rate limiting (inner — runs after CORS)
+app.add_middleware(RateLimitMiddleware)
+
+# CORS (outer — runs first)
+cors_kwargs: dict = dict(
     allow_origins=settings.cors_origin_list,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
+# Allow Vercel preview deploys via regex (set CORS_ORIGIN_REGEX env var, or use default)
+origin_regex = settings.cors_origin_regex or r"https://.*\.vercel\.app"
+cors_kwargs["allow_origin_regex"] = origin_regex
+app.add_middleware(CORSMiddleware, **cors_kwargs)
 
-# Rate limiting
-app.add_middleware(RateLimitMiddleware)
+@app.get("/")
+async def root():
+    """Root endpoint — basic service info."""
+    return {"service": "KeaBuilder API", "version": "1.0.0", "docs": "/docs"}
+
 
 # Static files — only serve workspace asset files, NOT internal dirs (chromadb, loras)
 # Blocked directories that should never be served

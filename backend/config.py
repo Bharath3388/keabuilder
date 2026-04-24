@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     app_port: int = 8000
     port: int = 8000  # Railway injects PORT env var
     cors_origins: str = "http://localhost:3000"
+    cors_origin_regex: str = ""  # Regex for matching dynamic origins (e.g. Vercel previews)
 
     # LLM — Groq (free tier)
     groq_api_key: str = ""

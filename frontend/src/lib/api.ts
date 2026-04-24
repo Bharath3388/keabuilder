@@ -1,7 +1,12 @@
 /** KeaBuilder API client for the frontend. */
 
-const BACKEND_URL =
-  (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+// In production (Vercel), use relative paths so requests go through Next.js rewrites
+// (same-origin, no CORS needed). Only use the full backend URL for local development
+// when rewrites aren't available.
+const IS_BROWSER = typeof window !== "undefined";
+const BACKEND_URL = IS_BROWSER
+  ? ""  // Browser: always use relative paths → Vercel rewrites proxy to backend
+  : (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
 export const API_BASE = BACKEND_URL + "/api/v1";
 const REQUEST_TIMEOUT_MS = 30_000;
 

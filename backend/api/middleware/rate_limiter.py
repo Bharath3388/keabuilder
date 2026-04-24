@@ -56,8 +56,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             del self.requests[key]
 
     async def dispatch(self, request: Request, call_next):
-        # Skip rate limiting for health checks and docs
+        # Skip rate limiting for health checks, docs, and CORS preflight
         if request.url.path in ("/api/v1/health", "/docs", "/openapi.json"):
+            return await call_next(request)
+        if request.method == "OPTIONS":
             return await call_next(request)
 
         client_ip = self._get_client_ip(request)
