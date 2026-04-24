@@ -1,0 +1,4 @@
+# Frontend — Vercel ignores everything except the frontend dir
+node_modules/
+.next/
+.env.local

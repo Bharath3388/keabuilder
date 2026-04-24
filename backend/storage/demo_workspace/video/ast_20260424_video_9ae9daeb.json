@@ -1,0 +1,43 @@
+{
+  "title": "Empowering Innovation",
+  "duration_seconds": 25,
+  "scenes": [
+    {
+      "scene_number": 1,
+      "description": "Intro to the company",
+      "duration_seconds": 3,
+      "camera_angle": "establishing shot",
+      "visual_style": "corporate footage"
+    },
+    {
+      "scene_number": 2,
+      "description": "Software development team at work",
+      "duration_seconds": 5,
+      "camera_angle": "over-the-shoulder",
+      "visual_style": "fast-paced cuts"
+    },
+    {
+      "scene_number": 3,
+      "description": "Client testimonials",
+      "duration_seconds": 8,
+      "camera_angle": "close-up",
+      "visual_style": "soft focus"
+    },
+    {
+      "scene_number": 4,
+      "description": "Company services overview",
+      "duration_seconds": 6,
+      "camera_angle": "bird's eye view",
+      "visual_style": "animated graphics"
+    },
+    {
+      "scene_number": 5,
+      "description": "Call to action",
+      "duration_seconds": 3,
+      "camera_angle": "point-of-view",
+      "visual_style": "screen capture"
+    }
+  ],
+  "voiceover_script": "In a rapidly changing world, innovation is key. Our software services company empowers businesses to stay ahead of the curve. With a team of expert developers and a passion for excellence, we deliver tailored solutions that drive success. But don't just take our word for it - our clients rave about our work. From concept to launch, we've got you covered. Discover how our services can transform your business. Get in touch with us today.",
+  "music_mood": "upbeat and inspirational"
+}

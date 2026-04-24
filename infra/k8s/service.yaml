@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keabuilder-backend
+  labels:
+    app: keabuilder
+    component: backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: keabuilder
+    component: backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keabuilder-frontend
+  labels:
+    app: keabuilder
+    component: frontend
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: keabuilder
+    component: frontend

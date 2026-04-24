@@ -1,0 +1,50 @@
+{
+  "title": "Apex Protection",
+  "duration_seconds": 30,
+  "scenes": [
+    {
+      "scene_number": 1,
+      "description": "Close-up of a hand carefully polishing a high-end motorcycle helmet. The helmet is sleek and modern, with visible carbon fiber weave.",
+      "duration_seconds": 5,
+      "camera_angle": "Extreme Close-up",
+      "visual_style": "High-contrast, shallow depth of field. Focus on craftsmanship and detail."
+    },
+    {
+      "scene_number": 2,
+      "description": "A motorcyclist, dressed in premium gear, is riding through a scenic mountain road. The camera follows them through a winding turn. Daytime, clear weather.",
+      "duration_seconds": 7,
+      "camera_angle": "Following Shot, low angle",
+      "visual_style": "Dynamic, vibrant colors, showcasing the freedom and exhilaration of riding. Helmet is clearly visible."
+    },
+    {
+      "scene_number": 3,
+      "description": "Slow-motion shot of a visor being closed, locking into place with a satisfying click. Focus on the precision and quality of the mechanism.",
+      "duration_seconds": 4,
+      "camera_angle": "Close-up",
+      "visual_style": "Slow-motion, clean and modern, emphasizing the feel of quality."
+    },
+    {
+      "scene_number": 4,
+      "description": "Quick cuts showcasing various helmet features: ventilation ports, comfortable inner lining, secure fastening system, and safety certifications (e.g., ECE, DOT).",
+      "duration_seconds": 6,
+      "camera_angle": "Variety of angles, close-ups",
+      "visual_style": "Modern, informative, highlighting key selling points with text overlays."
+    },
+    {
+      "scene_number": 5,
+      "description": "The motorcyclist from Scene 2 stops at a scenic overlook, takes off their helmet, and looks out at the breathtaking view. A sense of accomplishment and satisfaction.",
+      "duration_seconds": 5,
+      "camera_angle": "Medium shot, slightly elevated angle",
+      "visual_style": "Warm, inviting, emphasizing the feeling of connection with the open road."
+    },
+    {
+      "scene_number": 6,
+      "description": "Product shot of the helmet against a clean, minimalist background. Text overlay: \"Apex: Engineered for Performance, Designed for Protection.\"",
+      "duration_seconds": 3,
+      "camera_angle": "Static, eye-level",
+      "visual_style": "Clean, modern, showcasing the brand logo and tagline. Website address/social media handles displayed briefly."
+    }
+  ],
+  "voiceover_script": " (Scene 1) Precision engineering. (Scene 2) Uncompromising performance. (Scene 3) Unwavering safety. (Scene 4) Apex helmets. Designed with cutting-edge technology and crafted for ultimate protection. (Scene 5) Experience the difference. (Scene 6) Apex: Engineered for Performance, Designed for Protection.",
+  "music_mood": "Epic, inspirational, driving, with a touch of sophistication"
+}

@@ -1,0 +1,43 @@
+{
+  "title": "Innovate Tomorrow",
+  "duration_seconds": 25,
+  "scenes": [
+    {
+      "scene_number": 1,
+      "description": "Intro with company logo and tagline",
+      "duration_seconds": 3,
+      "camera_angle": "Frontal",
+      "visual_style": "Modern 3D animation"
+    },
+    {
+      "scene_number": 2,
+      "description": "Problem statement with futuristic cityscape",
+      "duration_seconds": 4,
+      "camera_angle": "Aerial",
+      "visual_style": "Neon-lit CGI"
+    },
+    {
+      "scene_number": 3,
+      "description": "Solution introduction with product demo",
+      "duration_seconds": 8,
+      "camera_angle": "Over-the-shoulder",
+      "visual_style": "Clean and minimalist"
+    },
+    {
+      "scene_number": 4,
+      "description": "Benefits and features with dynamic graphics",
+      "duration_seconds": 6,
+      "camera_angle": "Dynamic motion",
+      "visual_style": "Vibrant and playful"
+    },
+    {
+      "scene_number": 5,
+      "description": "Call to action with website and social media handles",
+      "duration_seconds": 4,
+      "camera_angle": "Frontal",
+      "visual_style": "Simple and straightforward"
+    }
+  ],
+  "voiceover_script": "Imagine a world where technology solves real problems. At our company, we're dedicated to innovating tomorrow. With our cutting-edge solution, you can streamline processes and achieve more. Join us in shaping the future, learn more at our website and follow us on social media.",
+  "music_mood": "Upbeat and futuristic"
+}

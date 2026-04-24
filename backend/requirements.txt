@@ -1,0 +1,55 @@
+# Core
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+python-dotenv==1.0.1
+pydantic==2.9.0
+pydantic-settings==2.5.0
+python-multipart==0.0.9
+email-validator==2.2.0
+
+# Database
+sqlalchemy==2.0.35
+aiosqlite==0.20.0
+alembic==1.13.0
+
+# AI/ML — LLM
+groq==0.11.0
+httpx==0.27.0
+
+# AI/ML — Image Generation (Hugging Face)
+huggingface-hub==0.25.0
+
+# AI/ML — Voice (Free TTS)
+edge-tts==6.1.12
+
+# AI/ML — Embeddings (Local, free)
+sentence-transformers==3.1.0
+
+# AI/ML — Vector Store (Free)
+chromadb==0.5.0
+
+# AI/ML — Face Detection (Free)
+insightface==0.7.3
+onnxruntime==1.19.0
+
+# Image Processing
+Pillow==10.4.0
+numpy==1.26.4
+
+# Caching & Queue
+redis==5.1.0
+celery[redis]==5.4.0
+
+# Resilience
+tenacity==9.0.0
+pybreaker==1.2.0
+
+# Monitoring
+prometheus-client==0.21.0
+structlog==24.4.0
+
+# Utilities
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+aiofiles==24.1.0
+boto3==1.35.0

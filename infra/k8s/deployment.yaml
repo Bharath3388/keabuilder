@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keabuilder-backend
+  labels:
+    app: keabuilder
+    component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: keabuilder
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: keabuilder
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: keabuilder/backend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: keabuilder-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keabuilder-frontend
+  labels:
+    app: keabuilder
+    component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: keabuilder
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: keabuilder
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: keabuilder/frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

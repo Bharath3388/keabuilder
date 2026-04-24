@@ -1,0 +1,1 @@
+{"status": "video_generation_requires_gpu", "prompt": "create the poster for building promotions", "message": "Video generation requires a GPU provider (Runway ML, Pika Labs). Configure RUNWAY_API_KEY in .env to enable."}

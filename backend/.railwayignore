@@ -1,0 +1,7 @@
+# Railway ignores these
+__pycache__/
+*.pyc
+venv/
+.env
+storage/chromadb/
+*.db
