@@ -59,8 +59,8 @@ storage_path.mkdir(parents=True, exist_ok=True)
 
 
 @app.get("/storage/{file_path:path}")
-async def serve_storage_file(file_path: str, _key: str = Depends(require_api_key)):
-    """Serve storage files with security checks."""
+async def serve_storage_file(file_path: str):
+    """Serve storage files with security checks (public — no API key needed for assets)."""
     # Block access to internal directories
     parts = Path(file_path).parts
     if not parts or parts[0] in _BLOCKED_STORAGE_DIRS:

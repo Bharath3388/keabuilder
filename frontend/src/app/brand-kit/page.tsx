@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { API_BASE } from "@/lib/api";
 
 export default function BrandKitPage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -31,7 +32,7 @@ export default function BrandKitPage() {
     files.forEach((f) => formData.append("images", f));
 
     try {
-      const res = await fetch("/api/v1/lora/train", {
+      const res = await fetch(`${API_BASE}/lora/train`, {
         method: "POST",
         body: formData,
       });
@@ -53,7 +54,7 @@ export default function BrandKitPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/v1/lora/generate", {
+      const res = await fetch(`${API_BASE}/lora/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

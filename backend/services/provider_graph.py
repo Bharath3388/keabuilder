@@ -144,56 +144,120 @@ async def image_node(state: ContentState) -> ContentState:
 
 
 async def voice_node(state: ContentState) -> ContentState:
-    """Voice generation node: Groq script → edge-tts synthesis."""
+    """Voice generation node: Gemini script generation + Gemini TTS, edge-tts fallback."""
     prompt = sanitize_prompt(state["prompt"])
     voice_id = state.get("voice_id")
 
-    # Step 1: Generate professional voiceover script via Groq LLM
+    # Step 1: Generate professional voiceover script via Gemini (or Groq fallback)
     script = prompt
-    if settings.groq_api_key:
+    if settings.gemini_api_key:
         try:
-            from groq import AsyncGroq
-            client = AsyncGroq(api_key=settings.groq_api_key)
-            response = await client.chat.completions.create(
-                model=settings.groq_model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a professional voiceover script writer. "
-                            "Given a user's prompt or description, generate a polished, "
-                            "natural-sounding voiceover script ready to be spoken aloud. "
-                            "Keep it concise (2-4 sentences). Do NOT include stage directions, "
-                            "speaker labels, or quotation marks. Output ONLY the script text."
-                        ),
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.7,
-                max_tokens=300,
+            from google import genai
+            client = genai.Client(api_key=settings.gemini_api_key)
+            response = client.models.generate_content(
+                model=settings.gemini_text_model,
+                contents=(
+                    "You are a professional voiceover script writer. "
+                    "Given a user's prompt or description, generate a polished, "
+                    "natural-sounding voiceover script ready to be spoken aloud. "
+                    "Keep it concise (2-4 sentences). Do NOT include stage directions, "
+                    "speaker labels, or quotation marks. Output ONLY the script text.\n\n"
+                    f"Prompt: {prompt}"
+                ),
             )
-            script = response.choices[0].message.content.strip()
-            logger.info("voice_script_generated", provider="groq", length=len(script))
+            script = response.text.strip()
+            logger.info("voice_script_generated", provider="gemini", length=len(script))
         except Exception as e:
-            logger.warning("voice_script_fallback", error=str(e))
+            logger.warning("voice_script_gemini_failed", error=str(e))
+            # Fallback to Groq for script
+            if settings.groq_api_key:
+                try:
+                    from groq import AsyncGroq
+                    groq_client = AsyncGroq(api_key=settings.groq_api_key)
+                    resp = await groq_client.chat.completions.create(
+                        model=settings.groq_model,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You are a professional voiceover script writer. "
+                                    "Given a user's prompt or description, generate a polished, "
+                                    "natural-sounding voiceover script ready to be spoken aloud. "
+                                    "Keep it concise (2-4 sentences). Do NOT include stage directions, "
+                                    "speaker labels, or quotation marks. Output ONLY the script text."
+                                ),
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=0.7,
+                        max_tokens=300,
+                    )
+                    script = resp.choices[0].message.content.strip()
+                    logger.info("voice_script_generated", provider="groq", length=len(script))
+                except Exception as e2:
+                    logger.warning("voice_script_fallback", error=str(e2))
 
-    # Step 2: Convert script to speech via edge-tts
-    import edge_tts
-    voice = voice_id or settings.tts_default_voice
-    communicate = edge_tts.Communicate(script, voice)
+    # Step 2: Convert script to speech — Gemini TTS primary, edge-tts fallback
+    data = None
+    tts_provider = "edge-tts"
 
-    audio_buffer = io.BytesIO()
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_buffer.write(chunk["data"])
+    if settings.gemini_api_key:
+        try:
+            from google import genai
+            from google.genai import types
 
-    data = audio_buffer.getvalue()
-    AI_CALL_COUNT.labels(provider="edge-tts", type="voice", status="success").inc()
-    logger.info("voice_generated", provider="edge-tts", size=len(data))
+            client = genai.Client(api_key=settings.gemini_api_key)
+            response = client.models.generate_content(
+                model="gemini-2.5-flash-preview-tts",
+                contents=script,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                                voice_name=voice_id or "Kore",
+                            )
+                        )
+                    ),
+                ),
+            )
+            audio_part = response.candidates[0].content.parts[0]
+            # Gemini returns raw PCM — convert to WAV
+            import wave
+            audio_buffer = io.BytesIO()
+            with wave.open(audio_buffer, "wb") as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)  # 16-bit
+                wf.setframerate(24000)
+                wf.writeframes(audio_part.inline_data.data)
+            data = audio_buffer.getvalue()
+            tts_provider = "gemini-tts"
+            logger.info("voice_generated", provider="gemini-tts", size=len(data))
+        except Exception as e:
+            logger.warning("gemini_tts_failed_trying_edge_tts", error=str(e))
+
+    # Fallback: edge-tts
+    if data is None:
+        try:
+            import edge_tts
+            voice = voice_id or settings.tts_default_voice
+            communicate = edge_tts.Communicate(script, voice)
+            audio_buffer = io.BytesIO()
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_buffer.write(chunk["data"])
+            data = audio_buffer.getvalue()
+            tts_provider = "edge-tts"
+            logger.info("voice_generated", provider="edge-tts", size=len(data))
+        except Exception as e:
+            logger.error("voice_generation_failed", error=str(e))
+            raise
+
+    AI_CALL_COUNT.labels(provider=tts_provider, type="voice", status="success").inc()
 
     state["data"] = data
-    state["provider_used"] = "groq+edge-tts"
-    state["ext"] = "mp3"
+    state["provider_used"] = tts_provider
+    state["ext"] = "wav" if tts_provider == "gemini-tts" else "mp3"
     state["subfolder"] = "voice"
     state["script"] = script
     return state

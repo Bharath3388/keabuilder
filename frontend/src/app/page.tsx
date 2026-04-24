@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { healthCheck } from "@/lib/api";
 
 export default function HomePage() {
   const [health, setHealth] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/health")
-      .then((r) => r.json())
+    healthCheck()
       .then(setHealth)
       .catch(() => setHealth({ status: "unreachable" }));
   }, []);

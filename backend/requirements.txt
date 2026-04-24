@@ -13,8 +13,15 @@ aiosqlite==0.20.0
 alembic==1.13.0
 
 # AI/ML — LLM
-groq==0.11.0
-httpx==0.27.0
+groq>=0.11.0
+httpx>=0.28.1
+
+# AI/ML — Google (Gemini + Imagen)
+google-genai>=1.14.0
+langchain-google-genai>=2.1.0
+
+# AI/ML — LangGraph (Content Router)
+langgraph>=0.4.0
 
 # AI/ML — Image Generation (Hugging Face)
 huggingface-hub==0.25.0
@@ -23,6 +30,9 @@ huggingface-hub==0.25.0
 edge-tts==6.1.12
 
 # AI/ML — Embeddings (Local, free)
+# Use CPU-only PyTorch to keep deploy image small (~500MB vs ~5GB with CUDA)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.4.0+cpu
 sentence-transformers==3.1.0
 
 # AI/ML — Vector Store (Free)

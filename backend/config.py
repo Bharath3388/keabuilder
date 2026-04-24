@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     trusted_proxies: list[str] = []  # IPs of trusted reverse proxies (e.g., ["10.0.0.0/8"])
 
     # API Authentication
-    api_keys: list[str] = []  # Comma-separated API keys for client auth
+    api_keys: str = ""  # Comma-separated API keys for client auth
 
     class Config:
         env_file = ".env"
@@ -82,6 +82,12 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]
+
+    @property
+    def api_key_list(self) -> list[str]:
+        if not self.api_keys:
+            return []
+        return [k.strip() for k in self.api_keys.split(",") if k.strip()]
 
 
 @lru_cache()

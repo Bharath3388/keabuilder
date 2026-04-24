@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { API_BASE, storageUrl } from "@/lib/api";
 
 export default function AssetsPage() {
   const [assets, setAssets] = useState<any[]>([]);
@@ -22,7 +23,7 @@ export default function AssetsPage() {
         workspace_id: "demo_workspace",
       });
       if (typeFilter) params.set("type", typeFilter);
-      const res = await fetch(`/api/v1/assets/?${params}`);
+      const res = await fetch(`${API_BASE}/assets/?${params}`);
       if (res.ok) {
         const data = await res.json();
         setAssets(data.assets || []);
@@ -51,7 +52,7 @@ export default function AssetsPage() {
         formData.append("workspace_id", "demo_workspace");
         formData.append("embed_type", searchType);
         formData.append("top_k", "10");
-        const res = await fetch("/api/v1/search/similar/image", {
+        const res = await fetch(`${API_BASE}/search/similar/image`, {
           method: "POST",
           body: formData,
         });
@@ -68,7 +69,7 @@ export default function AssetsPage() {
       if (!searchQuery.trim()) return;
       setLoading(true);
       try {
-        const res = await fetch("/api/v1/search/similar", {
+        const res = await fetch(`${API_BASE}/search/similar`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -204,7 +205,7 @@ export default function AssetsPage() {
                       {assetType === "image" && url && (
                         <div className="bg-gray-100 h-40">
                           <img
-                            src={url}
+                            src={storageUrl(url)}
                             alt={prompt}
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -215,7 +216,7 @@ export default function AssetsPage() {
                       )}
                       {assetType === "voice" && url && (
                         <div className="p-3 bg-gray-50">
-                          <audio controls className="w-full h-8" src={url}>
+                          <audio controls className="w-full h-8" src={storageUrl(url)}>
                             Your browser does not support audio.
                           </audio>
                         </div>
@@ -284,7 +285,7 @@ export default function AssetsPage() {
                 {asset.type === "image" && asset.url && (
                   <div className="bg-gray-100 h-40">
                     <img
-                      src={asset.url}
+                      src={storageUrl(asset.url)}
                       alt={asset.prompt || "Asset"}
                       className="w-full h-full object-cover"
                       onError={(e) => {

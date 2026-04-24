@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { generateContent, storageUrl } from "@/lib/api";
 
 export default function GeneratePage() {
   const [form, setForm] = useState({
@@ -21,26 +22,18 @@ export default function GeneratePage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/v1/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: form.type,
-          prompt: form.prompt,
-          style: form.style || undefined,
-          dimensions:
-            form.type === "image"
-              ? { width: form.width, height: form.height }
-              : undefined,
-          user_id: "demo_user",
-          workspace_id: "demo_workspace",
-        }),
+      const data = await generateContent({
+        type: form.type,
+        prompt: form.prompt,
+        style: form.style || undefined,
+        dimensions:
+          form.type === "image"
+            ? { width: form.width, height: form.height }
+            : undefined,
+        user_id: "demo_user",
+        workspace_id: "demo_workspace",
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || `Error: ${res.status}`);
-      }
-      setResult(await res.json());
+      setResult(data);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -178,7 +171,7 @@ export default function GeneratePage() {
               {form.type === "image" && result.url && (
                 <div className="mb-4 rounded-lg overflow-hidden bg-gray-100">
                   <img
-                    src={result.url}
+                    src={storageUrl(result.url)}
                     alt="Generated"
                     className="w-full h-auto"
                     onError={(e) => {
@@ -203,11 +196,11 @@ export default function GeneratePage() {
                       <p className="text-sm text-gray-800 leading-relaxed">{result.script}</p>
                     </div>
                   )}
-                  <audio controls className="w-full" src={result.url}>
+                  <audio controls className="w-full" src={storageUrl(result.url)}>
                     Your browser does not support the audio element.
                   </audio>
                   <a
-                    href={result.url}
+                    href={storageUrl(result.url)}
                     download
                     className="inline-block mt-2 text-xs text-kea-600 hover:text-kea-700 font-medium"
                   >
@@ -225,7 +218,7 @@ export default function GeneratePage() {
                       <p className="text-xs text-gray-500">Provider: {result.provider_used}</p>
                     </div>
                   </div>
-                  <VideoStoryboard url={result.url} />
+                  <VideoStoryboard url={storageUrl(result.url)} />
                 </div>
               )}
 

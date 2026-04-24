@@ -1,8 +1,17 @@
 /** KeaBuilder API client for the frontend. */
 
-const API_BASE =
-  (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "") + "/api/v1";
+const BACKEND_URL =
+  (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+export const API_BASE = BACKEND_URL + "/api/v1";
 const REQUEST_TIMEOUT_MS = 30_000;
+
+/** Resolve a relative storage path (e.g. /storage/...) to the full backend URL. */
+export function storageUrl(path: string): string {
+  if (!path) return path;
+  // Already absolute
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return BACKEND_URL + path;
+}
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 1_000;
 

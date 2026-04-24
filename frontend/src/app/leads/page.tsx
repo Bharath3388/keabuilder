@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { classifyLead } from "@/lib/api";
 
 interface ClassificationResult {
   lead_id: string;
@@ -37,16 +38,8 @@ export default function LeadsPage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/v1/leads/classify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || `Error: ${res.status}`);
-      }
-      setResult(await res.json());
+      const data = await classifyLead(form);
+      setResult(data as ClassificationResult);
     } catch (e: any) {
       setError(e.message);
     } finally {
