@@ -272,11 +272,26 @@ async def index_asset(
         raise ValueError(f"Unknown embed type: {embed_type}")
 
     collection = _get_collection(workspace_id, embed_type)
-    collection.upsert(
-        ids=[asset_id],
-        embeddings=[embedding],
-        metadatas=[metadata or {"asset_id": asset_id}],
-    )
+    try:
+        collection.upsert(
+            ids=[asset_id],
+            embeddings=[embedding],
+            metadatas=[metadata or {"asset_id": asset_id}],
+        )
+    except Exception as e:
+        if "dimension" in str(e).lower():
+            # Embedding dimension changed (e.g. provider switch). Reset collection.
+            logger.warning("dimension_mismatch_resetting_collection", error=str(e))
+            client = _get_chroma_client()
+            client.delete_collection(collection.name)
+            collection = _get_collection(workspace_id, embed_type)
+            collection.upsert(
+                ids=[asset_id],
+                embeddings=[embedding],
+                metadatas=[metadata or {"asset_id": asset_id}],
+            )
+        else:
+            raise
     logger.info(f"Indexed asset {asset_id} in {embed_type} collection")
 
 
@@ -306,11 +321,20 @@ async def search_similar(
 
     # Query ChromaDB
     collection = _get_collection(workspace_id, embed_type)
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=min(top_k, collection.count() or 1),
-        include=["distances", "metadatas"],
-    )
+    try:
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=min(top_k, collection.count() or 1),
+            include=["distances", "metadatas"],
+        )
+    except Exception as e:
+        if "dimension" in str(e).lower():
+            # Collection has stale embeddings with different dimensions — reset it
+            logger.warning("search_dimension_mismatch_resetting", error=str(e))
+            client = _get_chroma_client()
+            client.delete_collection(collection.name)
+            return {"results": [], "query_time_ms": 0, "total_results": 0}
+        raise
 
     elapsed_ms = (time.perf_counter() - start_time) * 1000
 
