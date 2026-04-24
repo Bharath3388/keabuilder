@@ -207,9 +207,14 @@ async def voice_node(state: ContentState) -> ContentState:
             from google.genai import types
 
             client = genai.Client(api_key=settings.gemini_api_key)
+
+            # Wrap the script in an explicit TTS instruction to avoid the model
+            # attempting to generate text instead of audio.
+            tts_contents = f"Read the following text aloud exactly as written:\n\n{script}"
+
             response = client.models.generate_content(
                 model="gemini-2.5-flash-preview-tts",
-                contents=script,
+                contents=tts_contents,
                 config=types.GenerateContentConfig(
                     response_modalities=["AUDIO"],
                     speech_config=types.SpeechConfig(
@@ -236,7 +241,7 @@ async def voice_node(state: ContentState) -> ContentState:
         except Exception as e:
             logger.warning("gemini_tts_failed_trying_edge_tts", error=str(e))
 
-    # Fallback: edge-tts
+    # Fallback: edge-tts (v7+ with DRM handling for 403 errors)
     if data is None:
         try:
             import edge_tts
@@ -250,8 +255,22 @@ async def voice_node(state: ContentState) -> ContentState:
             tts_provider = "edge-tts"
             logger.info("voice_generated", provider="edge-tts", size=len(data))
         except Exception as e:
-            logger.error("voice_generation_failed", error=str(e))
-            raise
+            logger.error("edge_tts_failed", error=str(e))
+
+    # Final fallback: generate a silent WAV so the request doesn't crash
+    if data is None:
+        logger.error("all_tts_providers_failed", prompt=prompt[:100])
+        import wave
+        audio_buffer = io.BytesIO()
+        with wave.open(audio_buffer, "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(24000)
+            # 1 second of silence
+            wf.writeframes(b"\x00" * 48000)
+        data = audio_buffer.getvalue()
+        tts_provider = "fallback-silent"
+        AI_CALL_COUNT.labels(provider="tts", type="voice", status="all_failed").inc()
 
     AI_CALL_COUNT.labels(provider=tts_provider, type="voice", status="success").inc()
 

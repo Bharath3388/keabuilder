@@ -1,6 +1,6 @@
 """Q2: Content generation API routes — powered by LangGraph multi-provider router."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from models.schemas import GenerateRequest, GenerateResponse, AssetMetadata, Dimensions
@@ -30,16 +30,23 @@ async def generate_content(req: GenerateRequest, db: Session = Depends(get_db), 
     width = req.dimensions.width if req.dimensions else 1024
     height = req.dimensions.height if req.dimensions else 1024
 
-    result = await route_generation_langgraph(
-        media_type=req.type.value,
-        prompt=req.prompt,
-        workspace_id=req.workspace_id,
-        user_id=req.user_id,
-        width=width,
-        height=height,
-        voice_id=req.voice_id,
-        style=req.style,
-    )
+    try:
+        result = await route_generation_langgraph(
+            media_type=req.type.value,
+            prompt=req.prompt,
+            workspace_id=req.workspace_id,
+            user_id=req.user_id,
+            width=width,
+            height=height,
+            voice_id=req.voice_id,
+            style=req.style,
+        )
+    except Exception as e:
+        logger.error("generation_failed", type=req.type.value, error=str(e))
+        raise HTTPException(
+            status_code=502,
+            detail=f"Content generation failed: {type(e).__name__}. Please try again.",
+        )
 
     # Persist asset record
     asset_record = AssetRecord(

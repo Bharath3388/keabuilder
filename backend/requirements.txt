@@ -27,7 +27,7 @@ langgraph>=0.4.0
 huggingface-hub==0.25.0
 
 # AI/ML — Voice (Free TTS)
-edge-tts==6.1.12
+edge-tts>=7.0.0
 
 # AI/ML — Embeddings (Local, free)
 # Use CPU-only PyTorch to keep deploy image small (~500MB vs ~5GB with CUDA)
