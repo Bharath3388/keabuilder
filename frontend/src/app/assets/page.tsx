@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { API_BASE, storageUrl } from "@/lib/api";
+import { API_BASE, storageUrl, apiHeaders } from "@/lib/api";
 
 export default function AssetsPage() {
   const [assets, setAssets] = useState<any[]>([]);
@@ -23,7 +23,9 @@ export default function AssetsPage() {
         workspace_id: "demo_workspace",
       });
       if (typeFilter) params.set("type", typeFilter);
-      const res = await fetch(`${API_BASE}/assets/?${params}`);
+      const res = await fetch(`${API_BASE}/assets/?${params}`, {
+        headers: apiHeaders(),
+      });
       if (res.ok) {
         const data = await res.json();
         setAssets(data.assets || []);
@@ -52,8 +54,12 @@ export default function AssetsPage() {
         formData.append("workspace_id", "demo_workspace");
         formData.append("embed_type", searchType);
         formData.append("top_k", "10");
+        const headers: Record<string, string> = {};
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+        if (apiKey) headers["X-API-Key"] = apiKey;
         const res = await fetch(`${API_BASE}/search/similar/image`, {
           method: "POST",
+          headers,
           body: formData,
         });
         if (res.ok) {
@@ -71,7 +77,7 @@ export default function AssetsPage() {
       try {
         const res = await fetch(`${API_BASE}/search/similar`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: apiHeaders(),
           body: JSON.stringify({
             query: searchQuery,
             workspace_id: "demo_workspace",

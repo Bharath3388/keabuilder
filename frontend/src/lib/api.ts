@@ -10,6 +10,18 @@ const BACKEND_URL = IS_BROWSER
 export const API_BASE = BACKEND_URL + "/api/v1";
 const REQUEST_TIMEOUT_MS = 30_000;
 
+/** Get default headers including API key for authenticated requests. */
+export function apiHeaders(extra?: Record<string, string>): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
+  }
+  return extra ? { ...headers, ...extra } : headers;
+}
+
 /** Resolve a relative storage path (e.g. /storage/...) to the full backend URL. */
 export function storageUrl(path: string): string {
   if (!path) return path;
@@ -50,15 +62,7 @@ export interface SimilaritySearchRequest {
 }
 
 async function apiCall<T>(path: string, options?: RequestInit): Promise<T> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  // Include API key if configured
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-  if (apiKey) {
-    headers["X-API-Key"] = apiKey;
-  }
+  const headers = apiHeaders();
 
   let lastError: Error | null = null;
 
