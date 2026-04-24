@@ -116,7 +116,7 @@ export async function classifyLead(lead: LeadInput) {
 
 export async function listLeads(classification?: string) {
   const params = classification ? `?classification=${classification}` : "";
-  return apiCall(`/leads/${params}`);
+  return apiCall(`/leads${params}`);
 }
 
 // Q2: Content Generation
@@ -139,7 +139,7 @@ export async function searchSimilar(req: SimilaritySearchRequest) {
 export async function listAssets(workspaceId: string, type?: string, page = 1) {
   const params = new URLSearchParams({ workspace_id: workspaceId, page: String(page) });
   if (type) params.set("type", type);
-  return apiCall(`/assets/?${params}`);
+  return apiCall(`/assets?${params}`);
 }
 
 // Health

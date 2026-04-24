@@ -37,6 +37,7 @@ app = FastAPI(
     description="AI-powered SaaS platform for funnels, lead capture, and automation",
     version="1.0.0",
     lifespan=lifespan,
+    redirect_slashes=False,
 )
 
 # Middleware order: last added = outermost (first to run)

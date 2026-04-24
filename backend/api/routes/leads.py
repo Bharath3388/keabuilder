@@ -79,6 +79,7 @@ async def classify_and_respond(lead: LeadInput, db: Session = Depends(get_db), _
     )
 
 
+@router.get("")
 @router.get("/")
 async def list_leads(
     classification: str | None = None,

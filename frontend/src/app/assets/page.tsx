@@ -23,7 +23,7 @@ export default function AssetsPage() {
         workspace_id: "demo_workspace",
       });
       if (typeFilter) params.set("type", typeFilter);
-      const res = await fetch(`${API_BASE}/assets/?${params}`, {
+      const res = await fetch(`${API_BASE}/assets?${params}`, {
         headers: apiHeaders(),
       });
       if (res.ok) {

@@ -2,5 +2,9 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://keabuilder-api-production.up.railway.app/api/:path*" },
+    { "source": "/storage/:path*", "destination": "https://keabuilder-api-production.up.railway.app/storage/:path*" }
+  ]
 }

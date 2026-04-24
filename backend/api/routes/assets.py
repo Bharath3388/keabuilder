@@ -11,6 +11,7 @@ from api.middleware.auth import require_api_key
 router = APIRouter()
 
 
+@router.get("")
 @router.get("/")
 async def list_assets(
     workspace_id: str = Query(...),
